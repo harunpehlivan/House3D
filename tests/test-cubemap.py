@@ -27,10 +27,9 @@ def create_house(houseID, config, robotRadius=0.1):
     if not os.path.isfile(cachefile):
         cachefile = None
 
-    house = House(jsonFile, objFile, config["modelCategoryFile"],
+    return House(jsonFile, objFile, config["modelCategoryFile"],
                   CachedFile=cachefile, GenRoomTypeMap=True,
                   RobotRadius=robotRadius)
-    return house
 
 def get_rand_house(cfg):
     house = None
@@ -60,7 +59,7 @@ if __name__ == '__main__':
     cam = api.getCamera()
     mode_idx = 0
 
-    for t in tqdm.trange(1000):
+    for _ in tqdm.trange(1000):
         reset_random(env, house)
         mat = cv2.cvtColor(env.render_cube_map(), cv2.COLOR_BGR2RGB)
         cv2.imshow("aaa", mat)

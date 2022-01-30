@@ -63,7 +63,7 @@ def create_house(houseID, config, robotRadius=ROBOT_RAD):
     if not os.path.isfile(cachefile):
         cachefile = None
 
-    house = RestrictedHouse(
+    return RestrictedHouse(
         JsonFile=jsonFile,
         ObjFile=objFile,
         MetaDataFile=config["modelCategoryFile"],
@@ -71,7 +71,6 @@ def create_house(houseID, config, robotRadius=ROBOT_RAD):
         RobotRadius=robotRadius,
         SetTarget=False,
         ApproximateMovableMap=True)
-    return house
 
 
 def get_house_dir(houseID):
@@ -108,7 +107,7 @@ def render_current_location(env, houseID, room_type, index):
         render_mode = RENDER_MODES[mode_idx]
         render_name = RENDER_NAMES[mode_idx]
 
-        env.set_render_mode(RENDER_MODES[mode_idx])
+        env.set_render_mode(render_mode)
         img = env.render_cube_map(copy=True)
         if render_mode == RenderMode.DEPTH:
             img = img[:, :, 0]

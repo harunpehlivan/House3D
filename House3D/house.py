@@ -57,10 +57,7 @@ def parse_walls(objFile, lower_bound = 1.0):
             for i in range(3):
                 if v[i] < v_min[i]: v_min[i] = v[i]
                 if v[i] > v_max[i]: v_max[i] = v[i]
-        obj = {}
-        obj['bbox'] = {}
-        obj['bbox']['min']=v_min
-        obj['bbox']['max']=v_max
+        obj = {'bbox': {'min': v_min, 'max': v_max}}
         if v_min[1] < lower_bound:
             return obj
         return None
@@ -177,7 +174,10 @@ class House(object):
         self.all_desired_roomTypes = []
         self.default_roomTp = None
         for roomTp in ALLOWED_TARGET_ROOM_TYPES:
-            if any([any([_equal_room_tp(tp, roomTp) for tp in tps]) for tps in self.all_roomTypes]):
+            if any(
+                any(_equal_room_tp(tp, roomTp) for tp in tps)
+                for tps in self.all_roomTypes
+            ):
                 self.all_desired_roomTypes.append(roomTp)
                 if self.default_roomTp is None: self.default_roomTp = roomTp
         assert self.default_roomTp is not None, 'Cannot Find Any Desired Rooms!'
@@ -331,7 +331,7 @@ class House(object):
         if n == 0: return []  # no components found!
         ret_comps = comps
         if return_open:
-            if len(open_comps) == 0:
+            if not open_comps:
                 print('WARNING!!!! [House] <find components in Target Room [%s]> No Open Components Found!!!! Return Largest Instead!!!!' % self.targetRoomTp)
                 return_largest = True
             else:
@@ -406,8 +406,12 @@ class House(object):
         if targetRoomTp in self.connMapDict:
             self.connMap, self.connectedCoors, self.inroomDist, self.maxConnDist = self.connMapDict[targetRoomTp]
             return True  # room Changed!
-        self.targetRooms = targetRooms = \
-            [room for room in self.all_rooms if any([ _equal_room_tp(tp, targetRoomTp) for tp in room['roomTypes']])]
+        self.targetRooms = targetRooms = [
+            room
+            for room in self.all_rooms
+            if any(_equal_room_tp(tp, targetRoomTp) for tp in room['roomTypes'])
+        ]
+
         assert (len(targetRooms) > 0), '[House] no room of type <{}> in the current house!'.format(targetRoomTp)
         ##########
         # generate destination mask map
@@ -451,7 +455,7 @@ class House(object):
                     inroomDist[x, y] = tdist
                 for x, y in curr_major_coors:
                     inroomDist[x, y] -= min_dist_to_center
-            if len(que) > 0:
+            if que:
                 break
         assert len(que) > 0, "Error!! [House] No space found for room type {}. House ID = {}"\
             .format(targetRoomTp, (self._id if hasattr(self, '_id') else 'NA'))
@@ -495,7 +499,7 @@ class House(object):
 
         # choose random location
         result = None
-        if len(locations) > 0:
+        if locations:
             idx = np.random.choice(len(locations))
             result = self.to_coor(locations[idx][0], locations[idx][1], True)
 
@@ -758,11 +762,11 @@ class House(object):
     returns all rooms of a given type
     """
     def _getRooms(self, roomTp):
-        rooms = [
-            r for r in self.all_rooms
-            if any([_equal_room_tp(tp, roomTp) for tp in r['roomTypes']])
+        return [
+            r
+            for r in self.all_rooms
+            if any(_equal_room_tp(tp, roomTp) for tp in r['roomTypes'])
         ]
-        return rooms
 
 
     """
@@ -806,8 +810,8 @@ class House(object):
         if visualize:
             plt.clf()
             ax = sns.heatmap(proj[:,::-1])
-            if visualize:
-                plt.show()
+        if visualize:
+            plt.show()
         return proj
 
     def _showConnMap(self):

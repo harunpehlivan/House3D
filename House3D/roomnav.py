@@ -169,7 +169,7 @@ class RoomNavTask(gym.Env):
         print('[RoomNavTask] >> Success Measure = <{}>'.format(success_measure))
         self.success_stay_cnt = 0
         if success_measure == 'see':
-            self.room_target_object = dict()
+            self.room_target_object = {}
             self._load_target_object_data(self.env.config['roomTargetFile'])
 
     def _load_target_object_data(self, roomTargetFile):
@@ -247,10 +247,9 @@ class RoomNavTask(gym.Env):
     def _apply_action(self, action):
         if self.discrete_action:
             return discrete_actions[action]
-        else:
-            rot = action[1][0] - action[1][1]
-            act = action[0]
-            return (act[0] - act[1]), (act[2] - act[3]), rot
+        rot = action[1][0] - action[1][1]
+        act = action[0]
+        return (act[0] - act[1]), (act[2] - act[3]), rot
 
     def _is_success(self, raw_dist):
         if raw_dist > 0:
@@ -345,10 +344,9 @@ class RoomNavTask(gym.Env):
             if raw_dist >= orig_raw_dist: reward -= time_penalty_reward
 
         # object seen reward
-        if (raw_dist == 0) and (self.success_measure == 'see'):  # inside target room and success measure is <see>
-            if not done:
-                object_reward = np.clip((self._object_cnt - n_pixel_for_object_sense) / L_pixel_reward_range, 0., 1.) * pixel_object_reward
-                reward += object_reward
+        if (raw_dist == 0) and (self.success_measure == 'see') and not done:
+            object_reward = np.clip((self._object_cnt - n_pixel_for_object_sense) / L_pixel_reward_range, 0., 1.) * pixel_object_reward
+            reward += object_reward
 
         if self.depth_signal:
             dep_sig = self.env.render(mode='depth')
@@ -395,7 +393,7 @@ class RoomNavTask(gym.Env):
             self.availCoors = [c for c in self.house.connectedCoors
                                if self.house.connMap[c[0], c[1]] <= allowed_dist]
         n_house = self.env.num_house
-        self._availCoorsDict = [dict() for i in range(n_house)]
+        self._availCoorsDict = [dict() for _ in range(n_house)]
         self._availCoorsDict[self.house._id][self.house.targetRoomTp] = self.availCoors
 
     """

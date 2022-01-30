@@ -42,7 +42,7 @@ def create_default_config(prefix, colormap='coarse'):
     assert colormap in ['coarse', 'fine']
 
     metadir = os.path.join(os.path.dirname(__file__), 'metadata')
-    ret = {
+    return {
         'colorFile':
         os.path.join(metadir, 'colormap_coarse.csv'
                      if colormap == 'coarse' else 'colormap_fine.csv'),
@@ -53,7 +53,6 @@ def create_default_config(prefix, colormap='coarse'):
         'prefix':
         prefix
     }
-    return ret
 
 
 def detect_nvidia_devices():
